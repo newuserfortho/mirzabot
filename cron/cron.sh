@@ -51,6 +51,8 @@ run_loop 30  /var/www/html/cronbot/expireagent.php
 
 run_loop 300 /var/www/html/cronbot/backupbot.php
 
+run_loop 60  /var/www/html/usage-snapshot.php
+
 # ── SOVRA maintenance scripts (formerly separate Railway services) ──
 run_loop 30  /var/www/html/cleanup-invoices.php
 run_loop 300 /var/www/html/db-backup.php
