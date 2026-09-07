@@ -156,11 +156,19 @@ class ManagePanel
                 $inbounds = $Get_Data_Panel['inbounds'];
             }
                         $ipLimit = isset($Get_Data_Product['ip_limit']) ? intval($Get_Data_Product['ip_limit']) : 0;
-            $data_Output = addClient($Get_Data_Panel, $usernameC, $expire, $subId, $data_limit, $inbounds, $Get_Data_Product['name_product'], $note, $ipLimit);
-            // اگر ip_limit > 0 بود، بعد از ساخت با update ستش کن (add قبولش نمی‌کنه)
-            if ($ipLimit > 0) {
-                @setClientIpLimit($Get_Data_Panel, $usernameC, $ipLimit, json_decode($inbounds, true) ?: [1]);
+            // نام گروه سنایی بر اساس محصول (برای نظم خودکار در پنل)
+            $sanaeiGroup = '';
+            if (!empty($Get_Data_Product)) {
+                $grpIp = isset($Get_Data_Product['ip_limit']) ? intval($Get_Data_Product['ip_limit']) : 0;
+                if ($grpIp > 0) {
+                    $sanaeiGroup = 'Namahdood ' . $grpIp . ' Karbare';
+                } else {
+                    $grpVol = isset($Get_Data_Product['Volume_constraint']) ? intval($Get_Data_Product['Volume_constraint']) : 0;
+                    if (in_array($grpVol, [5, 10, 15, 20], true)) $sanaeiGroup = $grpVol . ' Gig';
+                }
             }
+            $data_Output = addClient($Get_Data_Panel, $usernameC, $expire, $subId, $data_limit, $inbounds, $Get_Data_Product['name_product'], $note, $ipLimit, $sanaeiGroup);
+            // در سنایی v3 فیلد limitIp در خودِ add ست می‌شود؛ تلاش update اضافی لازم نیست.
             if (!empty($data_Output['error'])) {
                 error_log('xui addClient error [' . $usernameC . ']: ' . $data_Output['error']);
                 return array(
