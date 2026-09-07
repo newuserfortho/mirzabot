@@ -63,10 +63,20 @@ if (!$invoice) {
 
 // اگر در مرورگر باز شد → برو به صفحه‌ی زیبای ساب (همان که قبلاً درست شد)
 if ($isBrowser) {
+    // نام نمایشی: اول نام تلگرام کاربر، وگرنه نام/ایمیل کلاینتِ پنل
+    $displayName = $invoice['username'];
+    try {
+        $u = select("user", "username,namecustom", "id", $invoice['id_user'], "select");
+        if ($u && !empty($u['username']) && !in_array(strtolower($u['username']), ['none', 'not_username', ''])) {
+            $displayName = $u['username'];
+        }
+    } catch (Exception $e) {
+        // بی‌خیال — از نام پنل استفاده می‌کنیم
+    }
     $panel = select("marzban_panel", "*", "name_panel", $invoice['Service_location'], "select");
     $subId = xui_find_subid($panel, $invoice['username']);
     if ($subId) {
-        header('Location: https://sub.aminishere.shop/s.html?sub=' . rawurlencode($subId), true, 302);
+        header('Location: https://sub.aminishere.shop/s.html?sub=' . rawurlencode($subId) . '&name=' . rawurlencode($displayName), true, 302);
         exit;
     }
     // اگر subId پیدا نشد، طبق روال قبلی ادامه می‌دهیم تا خراب نشود
