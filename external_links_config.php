@@ -33,7 +33,7 @@ return [
         ['kind' => 'link', 'value' => 'vless://3896135c-1cbb-422c-a791-1ced77f24271@cdn.shop.mygharehshop.ir:19440?encryption=none&fp=chrome&pbk=3PhEYKQBMJEVb8U2OPajarRr4cDliFNvwbkMVL8eBnY&security=reality&sid=65483d&sni=www.cloudflare.com&spx=%2F4bc931d465ede08&type=tcp#%F0%9F%87%B9%F0%9F%87%B7%20Turkey%20-%20Ws(full%20tun)', 'remark' => '🇹🇷 Turkey - Ws(full tun)'],
 
         // ── لینک SOVRA روی سرور خودمان (Cloudflare WS — تست‌شده و کارا) ──
-        ['kind' => 'link', 'value' => 'vless://68aa7ea3-6d8c-46fb-94a7-f01ce4c069d0@sub.aminishere.shop:443?encryption=none&security=tls&sni=sub.aminishere.shop&type=ws&host=sub.aminishere.shop&path=%2Firanws&fp=chrome#IR-SOVRA-CF-WS', 'remark' => '🇮🇷 SOVRA Cloudflare WS'],
+        ['kind' => 'link', 'value' => 'vless://68aa7ea3-6d8c-46fb-94a7-f01ce4c069d0@sub.aminishere.shop:443?encryption=none&security=tls&sni=sub.aminishere.shop&type=ws&host=sub.aminishere.shop&path=%2Firanws&fp=chrome#Turkey%20%F0%9F%87%B9%F0%9F%87%B7%20Irancell%20SOVRA', 'remark' => 'Turkey 🇹🇷 Irancell SOVRA'],
     ],
 
     // آیا لینک‌های قبلیِ کلاینت هر بار جایگزین شوند؟ (true پیشنهاد می‌شود)
