@@ -51,6 +51,10 @@ function addClient($panel, $usernameac, $Expire, $subId, $Total, $inboundid, $na
         "subId" => $subId,
         "limitIp" => intval($ipLimit)
     ];
+    // سنایی v3: HWID Limit هم مثل IP Limit برای تعداد کاربر مجاز محصول ست می‌شود
+    if ($ipLimit > 0) {
+        $data['limitHwid'] = intval($ipLimit);
+    }
     if ($group !== '') {
         $data['group'] = $group;
     }
