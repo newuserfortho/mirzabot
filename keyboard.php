@@ -264,6 +264,9 @@ $payment_status_nowpayment = getPaySettingValue("statusnowpayment");
 $step_payment = [
     'inline_keyboard' => []
 ];
+$step_payment['inline_keyboard'][] = [
+    ['text' => '🛡 پرداخت با پشتیبانی', 'callback_data' => 'supportpay'],
+];
 if ($PaySettingcard == "oncard" && intval($users['cardpayment']) == 1) {
     if ($PaySettingpv == "oncardpv") {
         $step_payment['inline_keyboard'][] = [

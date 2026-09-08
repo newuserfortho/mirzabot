@@ -4648,6 +4648,51 @@ if ($user['step'] == "createusertest" || preg_match('/locationtest_(.*)/', $data
     sendmessage($from_id, $textbotlang['users']['Balance']['selectPayment'], $step_payment, 'HTML');
     step('get_step_payment', $from_id);
 } elseif ($user['step'] == "get_step_payment") {
+    if ($datain == "supportpay") {
+        $chk = $pdo->prepare("SELECT * FROM Payment_report WHERE id_user = :uid AND payment_Status = 'Unpaid'");
+        $chk->bindValue(':uid', $from_id, PDO::PARAM_STR); $chk->execute();
+        if (($chk)->rowCount() != 0) {
+            sendmessage($from_id, $textbotlang['users']['Balance']['pendingPayment'] ?? 'یک پرداخت در انتظار شماست؛ ابتدا آن را کامل کنید.', null, 'HTML');
+            return;
+        }
+        $amount = isset($user['Processing_value']) ? intval($user['Processing_value']) : 0;
+        $dateacc = date('Y/m/d H:i:s');
+        $order = bin2hex(random_bytes(5));
+        $invoiceId = "{$user['Processing_value_tow']}|{$user['Processing_value_one']}";
+        $desc = 'افزودن موجودی';
+        if (($user['Processing_value_tow'] ?? '') == 'getconfigafterpay') {
+            $inv = select("invoice", "*", "username", $user['Processing_value_one'], "select");
+            $desc = ($inv && isset($inv['name_product'])) ? $inv['name_product'] : 'سرویس جدید';
+        }
+        $st = $pdo->prepare("INSERT INTO Payment_report (id_user,id_order,time,price,payment_Status,Payment_Method,id_invoice) VALUES (?,?,?,?,?,?,?)");
+        $st->execute([$from_id, $order, $dateacc, $amount, 'Unpaid', 'support', $invoiceId]);
+        $fmt = number_format($amount);
+        $uname = (!empty($user['username']) && $user['username'] != 'none') ? $user['username'] : '—';
+        $admKb = json_encode(['inline_keyboard' => [[
+            ['text' => $textbotlang['users']['Balance']['confirmPaying'] ?? '✅ تأیید و ساخت سرویس', 'callback_data' => "Confirm_pay_{$order}"],
+            ['text' => $textbotlang['users']['Balance']['rejectPay'] ?? '❌ رد درخواست', 'callback_data' => "reject_pay_{$order}"],
+        ]]]);
+        foreach ($admin_ids as $adm) {
+            $ar = select("admin", "*", "id_admin", $adm, "select");
+            if ($ar && ($ar['rule'] ?? '') == 'support') continue;
+            sendmessage($adm, "🧾 درخواست پرداخت با پشتیبانی
+👤 کاربر: @{$uname} (<code>{$from_id}</code>)
+🛒 سرویس: <b>{$desc}</b>
+💰 مبلغ: <b>{$fmt}</b> تومان
+
+پس از هماهنگی و دریافت از سمت پشتیبانی، تأیید یا رد کنید.", $admKb, 'HTML');
+        }
+        $pre = 'درود؛ من کاربر ' . ((!empty($user['username']) && $user['username'] != 'none') ? '@' . $user['username'] : $from_id) . ' هستم و «' . $desc . '» به مبلغ ' . $fmt . ' تومان را درخواست دارم.';
+        $dm = 'https://t.me/SOVRA_vpn_support?text=' . rawurlencode($pre);
+        $userKb = json_encode(['inline_keyboard' => [[
+            ['text' => '💬 پرداخت با پشتیبانی', 'url' => $dm],
+        ], [
+            ['text' => $textbotlang['users']['status']['backinfo'] ?? '🔙 بازگشت', 'callback_data' => 'colselist'],
+        ]]]);
+        sendmessage($from_id, "برای تکمیل خرید، روی دکمه پایین بزنید و مبلغ <b>{$fmt} تومان</b> (سرویس: {$desc}) را با پشتیبانی هماهنگ کنید. پس از پرداخت، سرویس شما ساخته می‌شود.", $userKb, 'HTML');
+        step('home', $from_id);
+        return;
+    }
     if ($datain == "cart_to_offline") {
         $checkpay = $pdo->prepare("SELECT * FROM Payment_report WHERE id = :user_id AND payment_Status = 'Unpaid'");
         $checkpay->bindValue(':user_id', $from_id, PDO::PARAM_STR);

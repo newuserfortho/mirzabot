@@ -1844,7 +1844,24 @@ function sendMessageService($panel_info, $config, $sub_link, $username_service, 
     global $setting, $from_id, $textbotlang;
     if (!check_active_btn($setting['keyboardmain'], "text_help"))
         $reply_markup = null;
-    $user_id = $user_id == null ? $from_id : $user_id;
+    $user_id = $user_id == null ? $from_id : $user_id;    // ── دکمه «مشاهده در مرورگر» برای لینک ساب (صفحه داشبورد SOVRA) ──
+    if (is_string($sub_link) && stripos($sub_link, '/subs/') !== false) {
+        $viewUrl = preg_replace('#/subs/#', '/s.html?sub=', $sub_link, 1);
+        if (is_string($viewUrl) && $viewUrl !== $sub_link) {
+            $btnLabel = isset($textbotlang['keyboard']['viewSubDash']) ? $textbotlang['keyboard']['viewSubDash'] : '📊 مشاهده اطلاعات و نمودار مصرف';
+            $btnRow = [['text' => $btnLabel, 'url' => $viewUrl]];
+            if (is_string($reply_markup) && trim($reply_markup) !== '') {
+                $mk = json_decode($reply_markup, true);
+                if (is_array($mk) && isset($mk['inline_keyboard']) && is_array($mk['inline_keyboard'])) {
+                    $mk['inline_keyboard'][] = $btnRow;
+                    $reply_markup = json_encode($mk);
+                }
+            } else {
+                $reply_markup = json_encode(['inline_keyboard' => [$btnRow]]);
+            }
+        }
+    }
+
     $STATUS_SEND_MESSAGE_PHOTO = $panel_info['config'] == "onconfig" && (is_array($config) ? count($config) : 0) != 1 ? false : true;
     $out_put_qrcode = "";
     if ($panel_info['type'] == "Manualsale" || $panel_info['type'] == "ibsng" || $panel_info['type'] == "mikrotik") {
