@@ -916,6 +916,13 @@ if ($text == "/start" || $datain == "start" || $text == "start") {
     } else {
         $userpassword = "";
     }
+    // لینک مشاهده داشبورد ساب در مرورگر (فقط برای پنل‌های ساب‌دار)
+    $viewSubUrl = '';
+    if ($marzban['type'] == "x-ui_single" && !empty($DataUserOut['subscription_url'])
+        && is_string($DataUserOut['subscription_url'])
+        && preg_match('#^https?://#', $DataUserOut['subscription_url'])) {
+        $viewSubUrl = $DataUserOut['subscription_url'];
+    }
     if ($marzban['type'] == "Manualsale") {
         $userinfo = select("manualsell", "*", "username", $nameloc['username'], "select");
         $textinfo = sprintf($textbotlang['users']['status']['infoBasic'], $status_var, $DataUserOut['username'], $nameloc['id_invoice'], $userinfo['contentrecord']);
@@ -982,6 +989,11 @@ if ($text == "/start" || $datain == "start" || $text == "start") {
             unset($keyboardsetting['inline_keyboard'][1][1]);
         if ($marzbanstatusextra == "offextra")
             unset($keyboardsetting['inline_keyboard'][0][1]);
+        if ($viewSubUrl !== '') {
+            $keyboardsetting['inline_keyboard'][] = [
+                ['text' => $textbotlang['keyboard']['viewSubDash'], 'url' => $viewSubUrl]
+            ];
+        }
         $keyboardsetting['inline_keyboard'] = array_values($keyboardsetting['inline_keyboard']);
         $keyboardsetting = json_encode($keyboardsetting);
     } else {
@@ -1111,6 +1123,11 @@ if ($text == "/start" || $datain == "start" || $text == "start") {
         }
         if (count($tempArray) > 0) {
             $keyboardsetting['inline_keyboard'][] = $tempArray;
+        }
+        if ($viewSubUrl !== '') {
+            $keyboardsetting['inline_keyboard'][] = [
+                ['text' => $textbotlang['keyboard']['viewSubDash'], 'url' => $viewSubUrl]
+            ];
         }
         $keyboardsetting['inline_keyboard'][] = [['text' => $textbotlang['users']['status']['backlist'], 'callback_data' => 'backorder']];
         $keyboardsetting = json_encode($keyboardsetting);
@@ -4689,7 +4706,7 @@ if ($user['step'] == "createusertest" || preg_match('/locationtest_(.*)/', $data
         ], [
             ['text' => $textbotlang['users']['status']['backinfo'] ?? '🔙 بازگشت', 'callback_data' => 'colselist'],
         ]]]);
-        sendmessage($from_id, "برای تکمیل خرید، روی دکمه پایین بزنید و مبلغ <b>{$fmt} تومان</b> (سرویس: {$desc}) را با پشتیبانی هماهنگ کنید. پس از پرداخت، سرویس شما ساخته می‌شود.", $userKb, 'HTML');
+        sendmessage($from_id, "💳 <b>پرداخت کارت به کارت</b>\n\nبرای پرداخت مبلغ <b>{$fmt} تومان</b> (سرویس: {$desc})، روی دکمه پایین بزنید تا وارد گفتگوی پشتیبانی شوید و <b>شماره کارت</b> را دریافت کنید.\n\nپس از واریز، <b>رسید پرداخت</b> را در همان گفتگو ارسال کنید؛ پس از تأیید، سرویس شما <b>فعال</b> می‌شود. ✅", $userKb, 'HTML');
         step('home', $from_id);
         return;
     }
