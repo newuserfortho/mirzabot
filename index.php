@@ -57,10 +57,21 @@ if (is_array($keyboard_check) && preg_match('/[\x{600}-\x{6FF}\x{FB50}-\x{FDFF}]
     update("setting", "keyboardmain", $keyboardmain, null, null);
 }
 
-#-----------telegram_ip_ranges------------#
-if (!checktelegramip())
-    die("Unauthorized access");
-#-----------end telegram_ip_ranges------------#
+#-----------telegram_webhook_auth------------#
+$webhookSecret = getenv('WEBHOOK_SECRET') ?: '';
+$telegramSecret = $_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '';
+
+$validWebhookSecret = (
+    $webhookSecret !== '' &&
+    $telegramSecret !== '' &&
+    hash_equals($webhookSecret, $telegramSecret)
+);
+
+if (!$validWebhookSecret && !checktelegramip()) {
+    http_response_code(403);
+    die("Forbidden");
+}
+#-----------end telegram_webhook_auth------------#
 if (intval($from_id) == 0)
     return;
 #-------------Variable----------#
